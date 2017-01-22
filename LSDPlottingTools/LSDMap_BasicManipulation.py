@@ -5,7 +5,7 @@
 ## SMM
 ## 26/07/2014
 ##=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
+from __future__ import absolute_import, division, print_function, unicode_literals
 import osgeo.gdal as gdal
 import numpy as np
 from osgeo import osr
@@ -13,10 +13,10 @@ from os.path import exists
 from osgeo.gdalconst import GA_ReadOnly
 from numpy import uint8
 from glob import glob
-import LSDOSystemTools as LSDOst
-import LSDMap_GDALIO as LSDMap_IO
-import LSDMap_BasicPlotting as LSDMBP
-import LSDMap_PointData as LSDMPD
+from . import LSDOSystemTools as LSDOst
+from . import LSDMap_GDALIO as LSDMap_IO
+from . import LSDMap_BasicPlotting as LSDMBP
+from . import LSDMap_PointData as LSDMPD
 
 
 #==============================================================================
@@ -27,15 +27,15 @@ def SetNoDataBelowThreshold(raster_filename,new_raster_filename, threshold = 0, 
     
     # read the data
     rasterArray = LSDMap_IO.ReadRasterArrayBlocks(raster_filename)
-    print "Read the data"
+    print("Read the data")
     
     # set any point on the raster below the threshold as nodata
     rasterArray[rasterArray <= threshold] = NoDataValue
-    print "Reset raster values"
+    print("Reset raster values")
     
     # write the data to a new file
     LSDMap_IO.array2raster(raster_filename,new_raster_filename,rasterArray,driver_name, NoDataValue)
-    print "Wrote raster"
+    print("Wrote raster")
 #==============================================================================
 
 #==============================================================================
@@ -48,15 +48,15 @@ def SetToConstantValue(raster_filename,new_raster_filename, constant_value, driv
                
     # read the data
     rasterArray = LSDMap_IO.ReadRasterArrayBlocks(raster_filename)
-    print "Read the data"   
+    print("Read the data")   
     
     # set any nodata to a constant value
     rasterArray[rasterArray != NoDataValue] = constant_value
-    print "Changed to a constant value"
+    print("Changed to a constant value")
     
     # write the data to a new file
     LSDMap_IO.array2raster(raster_filename,new_raster_filename,rasterArray,driver_name, NoDataValue)
-    print "Wrote raster"
+    print("Wrote raster")
 
 #==============================================================================
 # This function calcualtes a hillshade and writes to file
@@ -78,11 +78,11 @@ def ConvertAllCSVToGeoJSON(path):
     # make sure names are in correct format
     NewPath = LSDOst.AppendSepToDirectoryPath(path)
     
-    print "The formatted path is: " + NewPath
+    print("The formatted path is: " + NewPath)
     
         
     for FileName in glob(NewPath+"*.csv"): 
-        print "filename is: " + FileName
+        print("filename is: " + FileName)
         
         thisPointData = LSDMPD.LSDMap_PointData(FileName)
         thisPointData.TranslateToReducedGeoJSON(FileName)
@@ -97,11 +97,11 @@ def ConvertAllCSVToShapefile(path):
     # make sure names are in correct format
     NewPath = LSDOst.AppendSepToDirectoryPath(path)
     
-    print "The formatted path is: " + NewPath
+    print("The formatted path is: " + NewPath)
     
         
     for FileName in glob(NewPath+"*.csv"): 
-        print "filename is: " + FileName
+        print("filename is: " + FileName)
         
         thisPointData = LSDMPD.LSDMap_PointData(FileName)
         thisPointData.TranslateToReducedShapefile(FileName)   
@@ -127,7 +127,7 @@ def BasinKeyToJunction(grouped_data_list,basin_info_csv):
                 this_list.append(thisJunctionData[element])
             junction_grouped_list.append(this_list)
 
-    print junction_grouped_list 
+    print(junction_grouped_list) 
     return junction_grouped_list
     
 ##=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -142,7 +142,7 @@ def BasinOrderer(Basin_csv_name, FileName, criteria_string,reverse=False,
     # now we need to label the basins
     # Now we get the chi points
     EPSG_string = LSDMap_IO.GetUTMEPSG(FileName)
-    print "EPSG string is: " + EPSG_string
+    print("EPSG string is: " + EPSG_string)
     
     thisPointData = LSDMPD.LSDMap_PointData(Basin_csv_name) 
     
@@ -163,7 +163,7 @@ def BasinOrderer(Basin_csv_name, FileName, criteria_string,reverse=False,
     indices = np.argsort(wd)
     
     print("data is: ")
-    print wd
+    print(wd)
 
     if reverse:
         indices = indices[::-1]
@@ -171,7 +171,7 @@ def BasinOrderer(Basin_csv_name, FileName, criteria_string,reverse=False,
     sorted_basins = np.array(these_data)[indices]
 
 
-    print sorted_basins       
+    print(sorted_basins)       
 
 
 #==============================================================================
@@ -234,12 +234,12 @@ def SimpleSwath(path, file1, axis):
     # get some information about the raster 
     NDV, xsize, ysize, GeoT, Projection, DataType = LSDMap_IO.GetGeoInfo(raster_file1)
     
-    print "NDV is: "
-    print NDV
+    print("NDV is: ")
+    print(NDV)
     
     if NDV == None:
         NDV = -9999
-        print "No NDV defined"
+        print("No NDV defined")
     
     Raster1 = LSDMap_IO.ReadRasterArrayBlocks(raster_file1,raster_band=1)
     
@@ -286,9 +286,9 @@ def BasicMassBalance(path, file1, file2):
     raster_file2 = NewPath+file2
     
     PixelArea = LSDMap_IO.GetPixelArea(raster_file1)
-    print "PixelArea is: " + str(PixelArea) 
+    print("PixelArea is: " + str(PixelArea)) 
     
-    print "The formatted path is: " + NewPath
+    print("The formatted path is: " + NewPath)
     Raster1 = LSDMap_IO.ReadRasterArrayBlocks(raster_file1,raster_band=1)
     Raster2 = LSDMap_IO.ReadRasterArrayBlocks(raster_file2,raster_band=1)
     
@@ -296,6 +296,6 @@ def BasicMassBalance(path, file1, file2):
     
     mass_balance = np.sum(NewRaster)*PixelArea
 
-    print "linear dif " + str(np.sum(NewRaster))    
+    print("linear dif " + str(np.sum(NewRaster)))    
         
     return mass_balance       
